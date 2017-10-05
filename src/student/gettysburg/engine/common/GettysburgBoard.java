@@ -35,11 +35,20 @@ public class GettysburgBoard
 	 */
 	public void moveUnit(GbgUnit unit, Coordinate from, Coordinate to)
 	{
-		map.remove(from);
+		Collection<GbgUnit> fromUnits = new ArrayList<GbgUnit>(map.get(from));
 		Collection<GbgUnit> units = new ArrayList<GbgUnit>();
+
+		fromUnits.remove(unit);
+
 		units.add(unit);
-		map.remove(from);
-		map.put((CoordinateImpl) to, units);
+
+		if (fromUnits.size() > 0) {
+			map.put((CoordinateImpl) GettysburgFactory.makeCoordinate(from.getX(), from.getY()), fromUnits);
+		} else {
+			map.remove((CoordinateImpl) GettysburgFactory.makeCoordinate(from.getX(), from.getY()));
+		}
+
+		map.put((CoordinateImpl) GettysburgFactory.makeCoordinate(to.getX(), to.getY()), units);
 	}
 	
 	/**

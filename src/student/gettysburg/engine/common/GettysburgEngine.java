@@ -142,6 +142,8 @@ public class GettysburgEngine implements GbgGame
 			GbgUnit unit = pair.getValue().iterator().next();
 			
 			for (Coordinate c: ((GbgUnitImpl) unit).getCurrentZoneControl(pair.getKey())) {
+				System.out.println(c);
+				System.out.println(getUnitsAt(c));
 				if (getUnitsAt(c) != null && ! c.equals(whereIsUnit(unit))) {
 					GbgUnit unitInZone = getUnitsAt(c).iterator().next();
 					if (isBattleTurnOf(unit)) { attackers.add(unit); }
