@@ -48,6 +48,8 @@ public class TestGettysburgEngine extends GettysburgEngine implements TestGbgGam
 	public void putUnitAt(GbgUnit arg0, int arg1, int arg2, Direction arg3)
 	{
 		arg0.setFacing(arg3);
+		this.board.getFacingChangeStatus().put(arg0, false);
+		this.board.getMovedStatus().put(arg0, false);
 		this.board.getMap().put((CoordinateImpl) GettysburgFactory.makeCoordinate(arg1, arg2), new ArrayList<GbgUnit>(Arrays.asList(arg0)));
 	}
 
