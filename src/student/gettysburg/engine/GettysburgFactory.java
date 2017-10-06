@@ -14,6 +14,7 @@ package student.gettysburg.engine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import gettysburg.common.*;
@@ -122,10 +123,21 @@ public final class GettysburgFactory
 	public static BattleDescriptor makeBattleDescriptor(
 			Collection<GbgUnit> attackers, Collection<GbgUnit> defenders)
 	{
-		Set<GbgUnit> attackersSet = new HashSet<GbgUnit>(attackers);
-		Set<GbgUnit> defendersSet = new HashSet<GbgUnit>(defenders);
+		BattleDescriptorImpl battle = new BattleDescriptorImpl();
+		
+		Iterator<GbgUnit> it1 = attackers.iterator();
+		
+		while (it1.hasNext()) {
+			battle.addAttacker(it1.next());
+		}
 
-		return new BattleDescriptorImpl(attackersSet, defendersSet);
+		Iterator<GbgUnit> it2 = attackers.iterator();
+		
+		while (it2.hasNext()) {
+			battle.addAttacker(it2.next());
+		}
+
+		return battle;
 	}
 	
 	/**

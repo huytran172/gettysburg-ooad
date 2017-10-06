@@ -35,6 +35,8 @@ public class GettysburgEngine implements GbgGame
 	protected GettysburgBoard board;
 
 	private Collection<BattleDescriptor> battles = new ArrayList<BattleDescriptor>();
+	List<GbgUnit> uniqueUnitsInBattle = new ArrayList<GbgUnit>();
+	Set<GbgUnit> unitsMustFight = new HashSet<GbgUnit>();
 //	boolean isBattleResolved = false;
 
 
@@ -88,19 +90,29 @@ public class GettysburgEngine implements GbgGame
 		switch (currentStep) {
 		case UMOVE:
 			board.clearStackedUnits();
+			unitsMustFight = board.getUnitsMustFight();
 			currentStep = GbgGameStep.UBATTLE;
+
 			return currentStep;
 
 		case UBATTLE:
 //			if (! isBattleResolved) {
 //				throw new GbgInvalidActionException("Must resolve battle");
 //			}
+			
+			if (unitsMustFight.size() > 0) {
+				throw new GbgInvalidActionException("Not all units have fought");
+			}
 
+			uniqueUnitsInBattle.clear();
 			currentStep = GbgGameStep.CMOVE;
 			board.initializeUnits(turnNumber, currentStep);
+
 			return currentStep;
 
 		case CMOVE:
+			board.clearStackedUnits();
+			unitsMustFight = board.getUnitsMustFight();
 			currentStep = GbgGameStep.CBATTLE;
 			return currentStep;
 
@@ -109,6 +121,11 @@ public class GettysburgEngine implements GbgGame
 //				throw new GbgInvalidActionException("Must resolve battle");
 //			}
 
+			if (unitsMustFight.size() > 0) {
+				throw new GbgInvalidActionException("Not all units have fought");
+			}
+
+			uniqueUnitsInBattle.clear();
 			currentStep = GbgGameStep.UMOVE;
 			turnNumber += 1;
 			board.resetStatus();
@@ -125,36 +142,42 @@ public class GettysburgEngine implements GbgGame
 	@Override
 	public Collection<BattleDescriptor> getBattlesToResolve()
 	{
-//		isBattleResolved = true;
-		
 		if (currentStep != GbgGameStep.CBATTLE && currentStep != GbgGameStep.UBATTLE) {
 			throw new GbgInvalidActionException("Invalid action");
 		}
 		
-		
 		Iterator<Entry<CoordinateImpl, Collection<GbgUnit>>> it = board.getMap().entrySet().iterator();
-		Set<GbgUnit> attackers = new HashSet<GbgUnit>();
-		Set<GbgUnit> defenders = new HashSet<GbgUnit>();
+
+		BattleDescriptorImpl battle = new BattleDescriptorImpl();
 		
 		while(it.hasNext()) {
 			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
-			if (pair.getValue() == null) continue;
 			GbgUnit unit = pair.getValue().iterator().next();
 			
 			for (Coordinate c: ((GbgUnitImpl) unit).getCurrentZoneControl(pair.getKey())) {
-				System.out.println(c);
-				System.out.println(getUnitsAt(c));
-				if (getUnitsAt(c) != null && ! c.equals(whereIsUnit(unit))) {
+				if (getUnitsAt(c) != null) {
 					GbgUnit unitInZone = getUnitsAt(c).iterator().next();
-					if (isBattleTurnOf(unit)) { attackers.add(unit); }
-					else { defenders.add(unit); }
 
-					if (isBattleTurnOf(unitInZone)) { attackers.add(unitInZone); }
-					else { defenders.add(unitInZone); }
+					if (isBattleTurnOf(unit) && ! battle.getAttackers().contains(unit)) { 
+						battle.addAttacker(unit); 
+					}
+					else if (! isBattleTurnOf(unit) && ! battle.getDefenders().contains(unit)) { 
+						battle.addDefender(unit); 
+					}
+
+					if (isBattleTurnOf(unitInZone) && ! battle.getAttackers().contains(unitInZone)) { 
+						battle.addAttacker(unitInZone); 
+					}
+					else if (! isBattleTurnOf(unitInZone) && ! battle.getDefenders().contains(unitInZone)){ 
+						battle.addDefender(unitInZone); 
+					}
 				}
 			}
 		}
-		battles.add(new BattleDescriptorImpl(attackers, defenders));
+		
+		battles.add(battle);
+		
+//		battles.add(new BattleDescriptorImpl(attackers, defenders));
 
 		return battles;
 	}
@@ -270,8 +293,46 @@ public class GettysburgEngine implements GbgGame
 	@Override
 	public BattleResolution resolveBattle(BattleDescriptor battle)
 	{
+		if (! isUnitParticipateInOneBattle(battle)) {
+			throw new GbgInvalidActionException("Unit in two or more battles");
+		}
+		
+//		if (! isBattleValid(battle)) {
+//			throw new GbgInvalidActionException("Battle is not valid");
+//		}
+		
+		markUnitsMustFightIn(battle);
+		
 		battles.remove(battle);
 		return new BattleResolutionImpl(battle);
+	}
+
+	private boolean isBattleValid(BattleDescriptor battle) 
+	{
+//		for (GbgUnit unit: battle.getAttackers()) {
+//			if (! board.getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit))) {
+//				return false;
+//			}
+//		}
+//
+//		for (GbgUnit unit: battle.getDefenders()) {
+//			if (! board.getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit))) {
+//				return false;
+//			}
+//		}
+		
+		return true;
+	}
+
+	private void markUnitsMustFightIn(BattleDescriptor battle) 
+	{
+		for (GbgUnit unit: battle.getAttackers()) {
+			unitsMustFight.remove(unit);
+		}
+
+		for (GbgUnit unit: battle.getDefenders()) {
+			unitsMustFight.remove(unit);
+		}
 	}
 
 	/*
@@ -297,6 +358,27 @@ public class GettysburgEngine implements GbgGame
 			} else {
 				throw new GbgInvalidMoveException("Inappropriate time for this move");
 			}
+	}
+	
+	public boolean isUnitParticipateInOneBattle(BattleDescriptor battle)
+	{
+		for (GbgUnit unit: battle.getAttackers()) {
+			if (! uniqueUnitsInBattle.contains(unit)) {
+				uniqueUnitsInBattle.add(unit);
+			} else {
+				return false;
+			}
+		}
+
+		for (GbgUnit unit1: battle.getDefenders()) {
+			if (! uniqueUnitsInBattle.contains(unit1)) {
+				uniqueUnitsInBattle.add(unit1);
+			} else {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 
 	/*

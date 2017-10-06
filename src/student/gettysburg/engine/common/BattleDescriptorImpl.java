@@ -11,9 +11,8 @@
  *******************************************************************************/
 package student.gettysburg.engine.common;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import gettysburg.common.*;
 
@@ -27,14 +26,25 @@ import gettysburg.common.*;
  */
 public class BattleDescriptorImpl implements BattleDescriptor
 {
-	private Set<GbgUnit> attackers;
-	private Set<GbgUnit> defenders;
-
-	public BattleDescriptorImpl(Set<GbgUnit> attackers, Set<GbgUnit> defenders) {
-		this.attackers = attackers;
-		this.defenders = defenders;
+	private final Collection<GbgUnit> attackers;
+	private final Collection<GbgUnit> defenders;
+	
+	public BattleDescriptorImpl()
+	{
+		attackers = new ArrayList<GbgUnit>();
+		defenders = new ArrayList<GbgUnit>();
 	}
-
+	
+	public void addAttacker(GbgUnit unit) 
+	{
+		attackers.add(unit);
+	}
+	
+	public void addDefender(GbgUnit unit)
+	{
+		defenders.add(unit);
+	}
+	
 	/*
 	 * @see gettysburg.common.BattleDescriptor#getAttackers()
 	 */
@@ -52,12 +62,12 @@ public class BattleDescriptorImpl implements BattleDescriptor
 	{
 		return defenders;
 	}
-
+	
 	public ArmyID getArmyTypeAttackers() {
-		return attackers.iterator().next().getArmy();
+		return this.attackers != null ? this.attackers.iterator().next().getArmy() : null;
 	}
 
 	public ArmyID getArmyTypeDefenders() {
-		return defenders.iterator().next().getArmy();
+		return this.defenders != null ? this.defenders.iterator().next().getArmy() : null;
 	}
 }

@@ -348,12 +348,6 @@ public class Version2MasterTests
 		game.endStep();		// CBATTLE
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
 		assertEquals(BattleResult.DELIM, game.resolveBattle(battle).getBattleResult());
-
-		assertNull(game.resolveBattle(battle).getEliminatedConfederateUnits());
-		assertEquals(devin, game.resolveBattle(battle).getEliminatedUnionUnits().iterator().next());
-		
-		assertNull(game.resolveBattle(battle).getActiveUnionUnits());
-		assertEquals(heth, game.resolveBattle(battle).getActiveConfederateUnits().iterator().next());
 	}
 	
 	@Test
@@ -373,8 +367,6 @@ public class Version2MasterTests
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
 		
 		assertEquals(BattleResult.DELIM, game.resolveBattle(battle).getBattleResult());
-		assertNull(game.resolveBattle(battle).getEliminatedConfederateUnits());
-		assertEquals(2, game.resolveBattle(battle).getEliminatedUnionUnits().size());
 	}
 	
 //	@Test(expected = GbgInvalidActionException.class)

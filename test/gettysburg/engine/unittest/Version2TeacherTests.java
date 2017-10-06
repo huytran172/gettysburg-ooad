@@ -340,14 +340,10 @@ public class Version2TeacherTests
 		assertEquals(heth, game.getUnitsAt(makeCoordinate(5, 5)).iterator().next());
 		game.moveUnit(devin, makeCoordinate(5,7), makeCoordinate(5, 6));
 		assertEquals(makeCoordinate(5, 6), game.whereIsUnit(devin));
-		System.out.println(((GettysburgEngine) game).getBoard().getAllEnemiesControlledZoneFor(heth));
-		System.out.println(((GettysburgEngine) game).getBoard().getAllEnemiesControlledZoneFor(devin));
 		game.endStep();		// UBATTLE
 		assertEquals(GbgGameStep.UBATTLE, game.getCurrentStep());
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
 		assertNotNull(battle);
-		System.out.println(battle.getAttackers().size());
-		System.out.println(battle.getDefenders().size());
 //		assertEquals(BattleResult.AELIM, game.resolveBattle(battle).getBattleResult());
 	}
 	
