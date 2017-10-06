@@ -59,7 +59,8 @@ public class BattleResolutionImpl implements BattleResolution
 			defendingFactor += u.getCombatFactor();
 		}
 		
-		double odds = attackingFactor / defendingFactor;
+		
+		double odds = attackingFactor * 1.0 / defendingFactor;
 		
 		if (odds >= 2.0) {
 			return BattleResult.DELIM;

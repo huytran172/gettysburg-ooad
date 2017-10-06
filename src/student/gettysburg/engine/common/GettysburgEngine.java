@@ -274,6 +274,11 @@ public class GettysburgEngine implements GbgGame
 		}
 	}
 
+	/**
+	 * Check if the unit can be move in that turn
+	 * @param unit
+	 * @return
+	 */
 	private boolean canUnitMove(GbgUnit unit) {
 		return (
 				this.getCurrentStep() == GbgGameStep.UMOVE && 
@@ -297,9 +302,9 @@ public class GettysburgEngine implements GbgGame
 			throw new GbgInvalidActionException("Unit in two or more battles");
 		}
 		
-//		if (! isBattleValid(battle)) {
-//			throw new GbgInvalidActionException("Battle is not valid");
-//		}
+		if (! isBattleValid(battle)) {
+			throw new GbgInvalidActionException("Battle is not valid");
+		}
 		
 		markUnitsMustFightIn(battle);
 		
@@ -307,23 +312,56 @@ public class GettysburgEngine implements GbgGame
 		return new BattleResolutionImpl(battle);
 	}
 
+	/**
+	 * Check if the battle is a valid battle
+	 * It is invalid when there exists a unit that has no enemy in its ZOC
+	 * and is not in ZOC of any enemies
+	 * @param battle
+	 * @return
+	 */
 	private boolean isBattleValid(BattleDescriptor battle) 
 	{
-//		for (GbgUnit unit: battle.getAttackers()) {
-//			if (! board.getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit))) {
-//				return false;
-//			}
-//		}
-//
-//		for (GbgUnit unit: battle.getDefenders()) {
-//			if (! board.getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit))) {
-//				return false;
-//			}
-//		}
+		for (GbgUnit unit: battle.getAttackers()) {
+			boolean isInEnemyZOC = board.getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit));
+			boolean isEnemyInZOC = false;
+			
+			for (Coordinate c: ((GbgUnitImpl) unit).getCurrentZoneControl(whereIsUnit(unit))) {
+				if (board.getMap().get(c) != null) {
+					isEnemyInZOC = ((GbgUnitImpl) unit).isEnemyOf(board.getMap().get(c).iterator().next());
+				}
+
+				if (isEnemyInZOC) break;
+			}
+			
+			if (! isEnemyInZOC && ! isInEnemyZOC) {
+				return false;
+			}
+		}
+
+		for (GbgUnit unit: battle.getDefenders()) {
+			boolean isInEnemyZOC = board.getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit));
+			boolean isEnemyInZOC = false;
+			
+			for (Coordinate c: ((GbgUnitImpl) unit).getCurrentZoneControl(whereIsUnit(unit))) {
+				if (board.getMap().get(c) != null) {
+					isEnemyInZOC = ((GbgUnitImpl) unit).isEnemyOf(board.getMap().get(c).iterator().next());
+				}
+				
+				if (isEnemyInZOC) break;
+			}
+			
+			if (! isEnemyInZOC && ! isInEnemyZOC) {
+				return false;
+			}
+		}
 		
 		return true;
 	}
 
+	/**
+	 * Remove the unit from unitMustFight if it participates in one battle
+	 * @param battle
+	 */
 	private void markUnitsMustFightIn(BattleDescriptor battle) 
 	{
 		for (GbgUnit unit: battle.getAttackers()) {
@@ -360,7 +398,12 @@ public class GettysburgEngine implements GbgGame
 			}
 	}
 	
-	public boolean isUnitParticipateInOneBattle(BattleDescriptor battle)
+	/**
+	 * Check if unit participates in only one battle
+	 * @param battle
+	 * @return
+	 */
+	private boolean isUnitParticipateInOneBattle(BattleDescriptor battle)
 	{
 		for (GbgUnit unit: battle.getAttackers()) {
 			if (! uniqueUnitsInBattle.contains(unit)) {
@@ -411,11 +454,14 @@ public class GettysburgEngine implements GbgGame
 		
 	}
 	
+	/**
+	 * Check if it is the battle turn of the unit
+	 * @param unit
+	 * @return
+	 */
 	private boolean isBattleTurnOf(GbgUnit unit) 
 	{
 		return (this.currentStep == GbgGameStep.CBATTLE && unit.getArmy() == ArmyID.CONFEDERATE) ||
 			(this.currentStep == GbgGameStep.UBATTLE && unit.getArmy() == ArmyID.UNION);
 	}
-	
-
 }
