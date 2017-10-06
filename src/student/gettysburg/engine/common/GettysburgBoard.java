@@ -35,11 +35,20 @@ public class GettysburgBoard
 	 */
 	public void moveUnit(GbgUnit unit, Coordinate from, Coordinate to)
 	{
-		map.remove(from);
+		Collection<GbgUnit> fromUnits = new ArrayList<GbgUnit>(map.get(from));
 		Collection<GbgUnit> units = new ArrayList<GbgUnit>();
+
+		fromUnits.remove(unit);
+
 		units.add(unit);
-		map.remove(from);
-		map.put((CoordinateImpl) to, units);
+
+		if (fromUnits.size() > 0) {
+			map.put((CoordinateImpl) GettysburgFactory.makeCoordinate(from.getX(), from.getY()), fromUnits);
+		} else {
+			map.remove((CoordinateImpl) GettysburgFactory.makeCoordinate(from.getX(), from.getY()));
+		}
+
+		map.put((CoordinateImpl) GettysburgFactory.makeCoordinate(to.getX(), to.getY()), units);
 	}
 	
 	/**
@@ -78,7 +87,7 @@ public class GettysburgBoard
 		
 		while(it.hasNext()) {
 			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
-			if (pair.getValue().contains(unit)) {
+			if (pair.getValue() != null && pair.getValue().contains(unit)) {
 				return pair.getKey();
 			}
 		}
@@ -142,12 +151,10 @@ public class GettysburgBoard
 		
 		while(it.hasNext()) {
 			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
-			if (pair.getValue().size() > 1) {
+			if (pair.getValue() != null && pair.getValue().size() > 1) {
 				map.replace(pair.getKey(), null);
 			}
 		}
-		
-		it.remove();
 	}
 	
 	/**
@@ -302,6 +309,27 @@ public class GettysburgBoard
 		}
 		getMovedStatus().put(ui.unit, false);
 		getFacingChangeStatus().put(ui.unit, false);
+	}
+
+	public Set<GbgUnit> getUnitsMustFight() {
+		Set<GbgUnit> unitsMustFight = new HashSet<GbgUnit>();
+		Iterator<Entry<CoordinateImpl, Collection<GbgUnit>>> it = map.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
+
+			if (pair.getValue() != null) {
+				for (GbgUnit unit: pair.getValue()) {
+					if (getAllEnemiesControlledZoneFor(unit) != null &&
+						getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit))
+					) {
+						unitsMustFight.add(unit);
+					}
+				}
+			}
+		}	
+
+		return unitsMustFight;
 	}
 	
 }

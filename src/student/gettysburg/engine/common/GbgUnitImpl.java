@@ -229,6 +229,12 @@ public class GbgUnitImpl implements GbgUnit
 		
 		return zones;
 	}
+	
+	
+	public boolean isEnemyOf(GbgUnit unit) 
+	{
+		return this.getArmy().equals(unit.getArmy()) ? false : true;
+	}
 
 	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
