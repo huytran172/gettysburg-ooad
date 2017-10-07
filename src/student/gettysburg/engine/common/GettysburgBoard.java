@@ -25,6 +25,7 @@ public class GettysburgBoard
 	private Map<CoordinateImpl, Collection<GbgUnit>> map = new HashMap<CoordinateImpl, Collection<GbgUnit>>();
 	private Map<GbgUnit, Boolean> facingChangeStatus = new HashMap<GbgUnit, Boolean>();
 	private Map<GbgUnit, Boolean> movedStatus = new HashMap<GbgUnit, Boolean>();
+	private static final int INFINITE_DISTANE = 999;
 	
 	/**
 	 * Helper method to use in engine
@@ -139,7 +140,6 @@ public class GettysburgBoard
 				}
 			}
 		}
-		
 	}
 	
 	/**
@@ -185,7 +185,7 @@ public class GettysburgBoard
 	 */
 	public int shortestPathDistance(GbgUnit unit, Coordinate from, Coordinate to)
 	{
-		return shortestPath(unit, from, to) != null ? shortestPath(unit, from, to).size() - 1 : 999;
+		return shortestPath(unit, from, to) != null ? shortestPath(unit, from, to).size() - 1 : INFINITE_DISTANE;
 	}
 
 	/**
@@ -218,6 +218,33 @@ public class GettysburgBoard
 	}
 	
 	/**
+	 * Get all the unit that must fight
+	 * which is in enemy's ZOC
+	 * 
+	 * @return Set<GbgUnit>
+	 */
+	public Set<GbgUnit> getUnitsMustFight() {
+		Set<GbgUnit> unitsMustFight = new HashSet<GbgUnit>();
+		Iterator<Entry<CoordinateImpl, Collection<GbgUnit>>> it = map.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
+	
+			if (pair.getValue() != null) {
+				for (GbgUnit unit: pair.getValue()) {
+					if (getAllEnemiesControlledZoneFor(unit) != null &&
+						getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit))
+					) {
+						unitsMustFight.add(unit);
+					}
+				}
+			}
+		}	
+	
+		return unitsMustFight;
+	}
+
+	/**
 	 * Get all occupied square by units on the board
 	 * @return
 	 */
@@ -247,6 +274,7 @@ public class GettysburgBoard
 	{
 		from = GettysburgFactory.makeCoordinate(from.getX(), from.getY());
 		to = GettysburgFactory.makeCoordinate(to.getX(), to.getY());
+		ArmyID enemyArmy = unit.getArmy().equals(ArmyID.CONFEDERATE) ? ArmyID.UNION : ArmyID.CONFEDERATE;
 
 		Set<Coordinate> enemiesControlledZone = getAllEnemiesControlledZoneFor(unit);
 		
@@ -265,15 +293,17 @@ public class GettysburgBoard
 	    		if (current.equals(to)) { break; }
 	    		else {
 	    			for (Coordinate c: ((CoordinateImpl) current).getNeighbors()) {
-	    				if (! visited.containsKey(c) && 
+	    				if (c != null &&
+	    					! visited.containsKey(c) && 
 	    					! enemiesControlledZone.contains(c) &&
-	    					c != null
+	    					! isThereUnitIn(((GbgUnitImpl) unit).getCurrentZoneControl(c), enemyArmy)
 	    				) {
 	    					queue.add(c);
 	    					visited.put(c, true);
 	    					prev.put(c, current);
-	    				} else if (! visited.containsKey(c) &&
-	    						enemiesControlledZone.contains(c) &&
+	    				} else if (c != null && ! visited.containsKey(c) &&
+	    						(enemiesControlledZone.contains(c) ||
+	    						isThereUnitIn(((GbgUnitImpl) unit).getCurrentZoneControl(c), enemyArmy)) && 
 	    						to.equals(c)
 	    				) {
 	    					queue.add(c);
@@ -297,6 +327,7 @@ public class GettysburgBoard
 	
 	/**
 	 * Helper method to put unit in unit intializer to the board
+	 * 
 	 * @param ui
 	 */
 	private void putUnitsToBoard(UnitInitializer ui) {
@@ -310,26 +341,23 @@ public class GettysburgBoard
 		getMovedStatus().put(ui.unit, false);
 		getFacingChangeStatus().put(ui.unit, false);
 	}
-
-	public Set<GbgUnit> getUnitsMustFight() {
-		Set<GbgUnit> unitsMustFight = new HashSet<GbgUnit>();
-		Iterator<Entry<CoordinateImpl, Collection<GbgUnit>>> it = map.entrySet().iterator();
+	
+	private boolean isThereUnitIn(Collection<Coordinate> coordinates, ArmyID army)
+	{
+		Iterator<Coordinate> it = coordinates.iterator();
 		
 		while(it.hasNext()) {
-			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
+			Coordinate c = it.next();
 
-			if (pair.getValue() != null) {
-				for (GbgUnit unit: pair.getValue()) {
-					if (getAllEnemiesControlledZoneFor(unit) != null &&
-						getAllEnemiesControlledZoneFor(unit).contains(whereIsUnit(unit))
-					) {
-						unitsMustFight.add(unit);
-					}
-				}
+			if (getMap().containsKey(c) && 
+				getMap().get(c).size() > 0 &&
+				getMap().get(c).iterator().next().getArmy().equals(army)
+			) {
+				return true;
 			}
 		}	
-
-		return unitsMustFight;
+		
+		return false;
 	}
 	
 }
