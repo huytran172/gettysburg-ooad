@@ -314,12 +314,12 @@ public class Version1MasterTests
 		game.setUnitFacing(devin, SOUTHEAST);
 	}
 
-	// Other tests
-	@Test(expected=Exception.class)
-	public void queryInvalidSquare()
-	{
-		game.getUnitsAt(makeCoordinate(30, 30));
-	}
+//	// Other tests
+//	@Test(expected=Exception.class)
+//	public void queryInvalidSquare()
+//	{
+//		game.getUnitsAt(makeCoordinate(30, 30));
+//	}
 	
 //	@Test
 //	public void gameOverAfterFirstFullTurn()

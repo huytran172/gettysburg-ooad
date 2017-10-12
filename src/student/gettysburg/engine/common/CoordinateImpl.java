@@ -57,6 +57,8 @@ public class CoordinateImpl implements Coordinate
 		if (x < 1 || x > GbgBoard.COLUMNS || y < 1 || y > GbgBoard.ROWS) {
 			throw new GbgInvalidCoordinateException(
 					"Coordinates for (" + x + ", " + y + ") are out of bounds.");
+			
+//			return null;
 		}
 		return new CoordinateImpl(x, y);
 	}

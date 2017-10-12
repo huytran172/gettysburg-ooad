@@ -266,6 +266,9 @@ public class Version2TeacherTests
 		game.moveUnit(heth, makeCoordinate(5,5), makeCoordinate(5, 6));
 		game.endStep();		// CBATTLE
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
+		System.out.println(battle.getAttackers().iterator().next().getLeader());
+		System.out.println(battle.getDefenders().iterator().next().getLeader());
+		System.out.println();
 		assertEquals(BattleResult.DELIM, game.resolveBattle(battle).getBattleResult());
 	}
 	
@@ -281,7 +284,12 @@ public class Version2TeacherTests
 		game.moveUnit(heth, makeCoordinate(5,5), makeCoordinate(5, 6));
 		game.endStep();		// CBATTLE
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
-		assertEquals(BattleResult.DELIM, game.resolveBattle(battle).getBattleResult());
+		BattleResolution result = game.resolveBattle(battle);
+		assertEquals(BattleResult.DELIM, result.getBattleResult());
+		assertEquals(1, result.getActiveConfederateUnits().size());
+		assertEquals(0, result.getActiveUnionUnits().size());
+		assertEquals(0, result.getEliminatedConfederateUnits().size());
+		assertEquals(2, result.getEliminatedUnionUnits().size());
 	}
 	
 	@Test
@@ -325,8 +333,8 @@ public class Version2TeacherTests
 		game.moveUnit(rowley, makeCoordinate(5, 7), makeCoordinate(5, 6));
 		game.moveUnit(gamble, makeCoordinate(20, 18), makeCoordinate(19, 18));
 		game.endStep();	// CBATTLE
-		assertEquals(BattleResult.EXCHANGE, game.resolveBattle(bd).getBattleResult());
-		assertEquals(BattleResult.EXCHANGE, game.resolveBattle(bd1).getBattleResult());
+		assertEquals(BattleResult.DELIM, game.resolveBattle(bd).getBattleResult());
+		assertEquals(BattleResult.DELIM, game.resolveBattle(bd1).getBattleResult());
 	}
 	
 	@Test

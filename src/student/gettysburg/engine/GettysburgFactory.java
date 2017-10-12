@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import gettysburg.common.*;
+import gettysburg.common.exceptions.GbgInvalidCoordinateException;
 import gettysburg.common.exceptions.GbgNotImplementedException;
 import gettysburg.engine.common.TestGettysburgEngine;
 import student.gettysburg.engine.common.BattleDescriptorImpl;
@@ -111,7 +112,11 @@ public final class GettysburgFactory
 	 */
 	public static Coordinate makeCoordinate(int x, int y)
 	{
-		return CoordinateImpl.makeCoordinate(x, y);
+		try {
+			return CoordinateImpl.makeCoordinate(x, y);
+		} catch (GbgInvalidCoordinateException e) {
+			return null;
+		}
 	}
 	
 	/**

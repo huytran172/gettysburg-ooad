@@ -222,7 +222,7 @@ public class GbgUnitImpl implements GbgUnit
 				break;
 			}
 		} catch (GbgInvalidCoordinateException e) {
-			e.getMessage();
+			throw e;
 		}
 		
 		zones.add(c);

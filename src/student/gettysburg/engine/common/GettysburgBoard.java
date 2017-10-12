@@ -342,6 +342,12 @@ public class GettysburgBoard
 		getFacingChangeStatus().put(ui.unit, false);
 	}
 	
+	/**
+	 * Check if there is a unit of the army in a coordinate
+	 * @param coordinates
+	 * @param army
+	 * @return
+	 */
 	private boolean isThereUnitIn(Collection<Coordinate> coordinates, ArmyID army)
 	{
 		Iterator<Coordinate> it = coordinates.iterator();
@@ -360,4 +366,64 @@ public class GettysburgBoard
 		return false;
 	}
 	
+	/**
+	 * Get all coordinate controller by this collection of units
+	 * @param units
+	 * @return Collection<Coordinate>
+	 */
+	public Collection<Coordinate> getZOCOfUnits(Collection<GbgUnit> units)
+	{
+		Set<Coordinate> coordinates = new HashSet<Coordinate>();
+		
+		for (GbgUnit unit: units) {
+			for (Coordinate c: ((GbgUnitImpl) unit).getCurrentZoneControl(whereIsUnit(unit))) {
+				coordinates.add(c);
+			}
+		}
+
+		return coordinates;
+	}
+	
+	/**
+	 * Move the unit back 1 free square which is out of enemy zone
+	 * 
+	 * @param unit
+	 * @return true if move successfully, false otherwise
+	 */
+	public boolean moveBack(GbgUnit unit, Collection<GbgUnit> enemies)
+	{
+		Coordinate current = whereIsUnit(unit);
+		Collection<Coordinate> enemyCoordinates = getZOCOfUnits(enemies);
+		
+		for (Coordinate moveableCoordinate: ((CoordinateImpl) current).getNeighbors()) {
+			if (moveableCoordinate != null && 
+				! enemyCoordinates.contains(moveableCoordinate)
+			) {
+				moveUnit(unit, current, moveableCoordinate);
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	/**
+	 * Remove the unit from the board
+	 * 
+	 * @param unit
+	 */
+	public void removeUnit(GbgUnit unit)
+	{
+		Iterator<Entry<CoordinateImpl, Collection<GbgUnit>>> it = map.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
+			if (pair.getValue() != null && pair.getValue().contains(unit)) {
+				pair.getValue().remove(unit);
+
+				return;
+			}
+		}	
+	}
 }
