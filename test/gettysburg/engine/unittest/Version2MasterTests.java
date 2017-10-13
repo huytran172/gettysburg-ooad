@@ -165,7 +165,7 @@ public class Version2MasterTests
 	}
 	
 	@Test
-	public void devin_moves_south_using_another_coordinate_system()
+	public void devin_moves_south_using_another_coordinate_()
 	{
 		game.moveUnit(devin, new TestCoordinate(13, 9), makeCoordinate(13, 11));
 		assertEquals(makeCoordinate(13, 11), game.whereIsUnit(devin));
@@ -347,7 +347,12 @@ public class Version2MasterTests
 		assertEquals(makeCoordinate(5, 6), testGame.whereIsUnit(heth));
 		game.endStep();		// CBATTLE
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
-		assertEquals(BattleResult.DELIM, game.resolveBattle(battle).getBattleResult());
+		BattleResolution bs = game.resolveBattle(battle);
+		assertEquals(BattleResult.DELIM, bs.getBattleResult());
+		assertEquals(devin, bs.getEliminatedUnionUnits().iterator().next());
+		assertEquals(heth, bs.getActiveConfederateUnits().iterator().next());
+		assertEquals(0, bs.getActiveUnionUnits().size());
+		assertEquals(0, bs.getEliminatedConfederateUnits().size());
 	}
 	
 	@Test

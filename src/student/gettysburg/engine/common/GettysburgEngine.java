@@ -30,6 +30,7 @@ public class GettysburgEngine implements GbgGame
 {
 	protected int turnNumber = 1;
 	protected GbgGameStep currentStep = GbgGameStep.UMOVE;
+	protected List<BattleResult> results;
 
 	private static int HOURS_IN_ONE_BATTLE_DAY = 13;
 	protected GettysburgBoard board;
@@ -37,6 +38,7 @@ public class GettysburgEngine implements GbgGame
 	private Collection<BattleDescriptor> battles = new ArrayList<BattleDescriptor>();
 	List<GbgUnit> uniqueUnitsInBattle = new ArrayList<GbgUnit>();
 	Set<GbgUnit> unitsMustFight = new HashSet<GbgUnit>();
+
 
 	public GettysburgEngine(GettysburgBoard board) 
 	{
@@ -181,7 +183,8 @@ public class GettysburgEngine implements GbgGame
 		markUnitsMustFightIn(battle);
 		
 		battles.remove(battle);
-		return new BattleResolutionImpl(battle);
+		
+		return new BattleResolutionImpl(battle, board);
 	}
 
 	/*

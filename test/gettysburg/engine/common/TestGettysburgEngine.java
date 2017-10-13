@@ -13,6 +13,7 @@ package gettysburg.engine.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import gettysburg.common.*;
 import student.gettysburg.engine.GettysburgFactory;
@@ -80,5 +81,9 @@ public class TestGettysburgEngine extends GettysburgEngine implements TestGbgGam
 	{
 		this.turnNumber = arg0;
 	}
-
+	
+	public void setBattleResults(List<BattleResult> results)
+	{
+		this.results = results;
+	}
 }

@@ -266,9 +266,6 @@ public class Version2TeacherTests
 		game.moveUnit(heth, makeCoordinate(5,5), makeCoordinate(5, 6));
 		game.endStep();		// CBATTLE
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
-		System.out.println(battle.getAttackers().iterator().next().getLeader());
-		System.out.println(battle.getDefenders().iterator().next().getLeader());
-		System.out.println();
 		assertEquals(BattleResult.DELIM, game.resolveBattle(battle).getBattleResult());
 	}
 	

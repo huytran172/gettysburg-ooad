@@ -74,8 +74,6 @@ public class Version3Tests
 		List<GbgUnit> enemies = new ArrayList<GbgUnit>();
 		enemies.add(devin);
 		enemies.add(gamble);
-		System.out.println(((GbgUnitImpl) devin).getCurrentZoneControl(game.whereIsUnit(devin)));
-		System.out.println(((GbgUnitImpl) gamble).getCurrentZoneControl(game.whereIsUnit(gamble)));
 		
 		// Still have (2,2) to move back
 		assertTrue(((GettysburgEngine) game).getBoard().moveBack(heth, enemies));
@@ -92,8 +90,6 @@ public class Version3Tests
 		List<GbgUnit> enemies = new ArrayList<GbgUnit>();
 		enemies.add(devin);
 		enemies.add(gamble);
-		System.out.println(((GbgUnitImpl) devin).getCurrentZoneControl(game.whereIsUnit(devin)));
-		System.out.println(((GbgUnitImpl) gamble).getCurrentZoneControl(game.whereIsUnit(gamble)));
 		
 		assertFalse(((GettysburgEngine) game).getBoard().moveBack(heth, enemies));
 	}

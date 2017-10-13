@@ -245,128 +245,6 @@ public class GettysburgBoard
 	}
 
 	/**
-	 * Get all occupied square by units on the board
-	 * @return
-	 */
-	private Set<Coordinate> getAllOccupiedSquare()
-	{
-		HashSet<Coordinate> occupied = new HashSet<Coordinate>();
-		Iterator<Entry<CoordinateImpl, Collection<GbgUnit>>> it = map.entrySet().iterator();
-		
-		while(it.hasNext()) {
-			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
-			if (pair.getValue() != null) {
-				occupied.add(pair.getKey());
-			}
-		}	
-		
-		return occupied;
-	}
-	
-	/**
-	 * Shortest path of a unit from the source coordinate to destination coordinate
-	 * @param unit
-	 * @param from
-	 * @param to
-	 * @return LinkedList path to destination
-	 */
-	private List<Coordinate> shortestPath(GbgUnit unit, Coordinate from, Coordinate to) 
-	{
-		from = GettysburgFactory.makeCoordinate(from.getX(), from.getY());
-		to = GettysburgFactory.makeCoordinate(to.getX(), to.getY());
-		ArmyID enemyArmy = unit.getArmy().equals(ArmyID.CONFEDERATE) ? ArmyID.UNION : ArmyID.CONFEDERATE;
-
-		Set<Coordinate> enemiesControlledZone = getAllEnemiesControlledZoneFor(unit);
-		
-		Map<Coordinate, Boolean> visited = new HashMap<Coordinate, Boolean>();
-		Map<Coordinate, Coordinate> prev = new HashMap<Coordinate, Coordinate>();
-	    List<Coordinate> directions = new LinkedList<Coordinate>();
-	    Queue<Coordinate> queue = new LinkedList<Coordinate>();
-	    
-	    Coordinate current = from;
-	    queue.add(current);
-	    visited.put(current, true);
-	    
-	    while (! queue.isEmpty()) {
-	    		current = queue.remove();
-	    		
-	    		if (current.equals(to)) { break; }
-	    		else {
-	    			for (Coordinate c: ((CoordinateImpl) current).getNeighbors()) {
-	    				if (c != null &&
-	    					! visited.containsKey(c) && 
-	    					! enemiesControlledZone.contains(c) &&
-	    					! isThereUnitIn(((GbgUnitImpl) unit).getCurrentZoneControl(c), enemyArmy)
-	    				) {
-	    					queue.add(c);
-	    					visited.put(c, true);
-	    					prev.put(c, current);
-	    				} else if (c != null && ! visited.containsKey(c) &&
-	    						(enemiesControlledZone.contains(c) ||
-	    						isThereUnitIn(((GbgUnitImpl) unit).getCurrentZoneControl(c), enemyArmy)) && 
-	    						to.equals(c)
-	    				) {
-	    					queue.add(c);
-	    					visited.put(c, true);
-	    					prev.put(c, current);
-	    				}
-	    			}
-	    		}
-	    }
-	    
-	    if (! current.equals(to)) {
-	    		return null;
-	    }
-	    
-	    for (Coordinate c = to; c != null; c = prev.get(c)) {
-	    		directions.add(c);
-	    }
-	    
-	    return directions;
-	}
-	
-	/**
-	 * Helper method to put unit in unit intializer to the board
-	 * 
-	 * @param ui
-	 */
-	private void putUnitsToBoard(UnitInitializer ui) {
-		if (getMap().containsKey(ui.where)) {
-			getMap().get(ui.where).add(ui.unit);
-		} else {
-			Collection<GbgUnit> units = new ArrayList<GbgUnit>();
-			units.add(ui.unit);
-			getMap().put((CoordinateImpl) GettysburgFactory.makeCoordinate(ui.where.getX(),  ui.where.getY()), units);
-		}
-		getMovedStatus().put(ui.unit, false);
-		getFacingChangeStatus().put(ui.unit, false);
-	}
-	
-	/**
-	 * Check if there is a unit of the army in a coordinate
-	 * @param coordinates
-	 * @param army
-	 * @return
-	 */
-	private boolean isThereUnitIn(Collection<Coordinate> coordinates, ArmyID army)
-	{
-		Iterator<Coordinate> it = coordinates.iterator();
-		
-		while(it.hasNext()) {
-			Coordinate c = it.next();
-
-			if (getMap().containsKey(c) && 
-				getMap().get(c).size() > 0 &&
-				getMap().get(c).iterator().next().getArmy().equals(army)
-			) {
-				return true;
-			}
-		}	
-		
-		return false;
-	}
-	
-	/**
 	 * Get all coordinate controller by this collection of units
 	 * @param units
 	 * @return Collection<Coordinate>
@@ -421,9 +299,131 @@ public class GettysburgBoard
 			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
 			if (pair.getValue() != null && pair.getValue().contains(unit)) {
 				pair.getValue().remove(unit);
-
+	
 				return;
 			}
 		}	
+	}
+
+	/**
+	 * Get all occupied square by units on the board
+	 * @return
+	 */
+	private Set<Coordinate> getAllOccupiedSquare()
+	{
+		HashSet<Coordinate> occupied = new HashSet<Coordinate>();
+		Iterator<Entry<CoordinateImpl, Collection<GbgUnit>>> it = map.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<CoordinateImpl, Collection<GbgUnit>> pair = (Map.Entry<CoordinateImpl, Collection<GbgUnit>>) it.next();
+			if (pair.getValue() != null) {
+				occupied.add(pair.getKey());
+			}
+		}	
+		
+		return occupied;
+	}
+
+	/**
+	 * Shortest path of a unit from the source coordinate to destination coordinate
+	 * @param unit
+	 * @param from
+	 * @param to
+	 * @return LinkedList path to destination
+	 */
+	private List<Coordinate> shortestPath(GbgUnit unit, Coordinate from, Coordinate to) 
+	{
+		from = GettysburgFactory.makeCoordinate(from.getX(), from.getY());
+		to = GettysburgFactory.makeCoordinate(to.getX(), to.getY());
+		ArmyID enemyArmy = unit.getArmy().equals(ArmyID.CONFEDERATE) ? ArmyID.UNION : ArmyID.CONFEDERATE;
+	
+		Set<Coordinate> enemiesControlledZone = getAllEnemiesControlledZoneFor(unit);
+		
+		Map<Coordinate, Boolean> visited = new HashMap<Coordinate, Boolean>();
+		Map<Coordinate, Coordinate> prev = new HashMap<Coordinate, Coordinate>();
+	    List<Coordinate> directions = new LinkedList<Coordinate>();
+	    Queue<Coordinate> queue = new LinkedList<Coordinate>();
+	    
+	    Coordinate current = from;
+	    queue.add(current);
+	    visited.put(current, true);
+	    
+	    while (! queue.isEmpty()) {
+	    		current = queue.remove();
+	    		
+	    		if (current.equals(to)) { break; }
+	    		else {
+	    			for (Coordinate c: ((CoordinateImpl) current).getNeighbors()) {
+	    				if (c != null &&
+	    					! visited.containsKey(c) && 
+	    					! enemiesControlledZone.contains(c) &&
+	    					! isThereUnitIn(((GbgUnitImpl) unit).getCurrentZoneControl(c), enemyArmy)
+	    				) {
+	    					queue.add(c);
+	    					visited.put(c, true);
+	    					prev.put(c, current);
+	    				} else if (c != null && ! visited.containsKey(c) &&
+	    						(enemiesControlledZone.contains(c) ||
+	    						isThereUnitIn(((GbgUnitImpl) unit).getCurrentZoneControl(c), enemyArmy)) && 
+	    						to.equals(c)
+	    				) {
+	    					queue.add(c);
+	    					visited.put(c, true);
+	    					prev.put(c, current);
+	    				}
+	    			}
+	    		}
+	    }
+	    
+	    if (! current.equals(to)) {
+	    		return null;
+	    }
+	    
+	    for (Coordinate c = to; c != null; c = prev.get(c)) {
+	    		directions.add(c);
+	    }
+	    
+	    return directions;
+	}
+
+	/**
+	 * Helper method to put unit in unit intializer to the board
+	 * 
+	 * @param ui
+	 */
+	private void putUnitsToBoard(UnitInitializer ui) {
+		if (getMap().containsKey(ui.where)) {
+			getMap().get(ui.where).add(ui.unit);
+		} else {
+			Collection<GbgUnit> units = new ArrayList<GbgUnit>();
+			units.add(ui.unit);
+			getMap().put((CoordinateImpl) GettysburgFactory.makeCoordinate(ui.where.getX(),  ui.where.getY()), units);
+		}
+		getMovedStatus().put(ui.unit, false);
+		getFacingChangeStatus().put(ui.unit, false);
+	}
+
+	/**
+	 * Check if there is a unit of the army in a coordinate
+	 * @param coordinates
+	 * @param army
+	 * @return
+	 */
+	private boolean isThereUnitIn(Collection<Coordinate> coordinates, ArmyID army)
+	{
+		Iterator<Coordinate> it = coordinates.iterator();
+		
+		while(it.hasNext()) {
+			Coordinate c = it.next();
+	
+			if (getMap().containsKey(c) && 
+				getMap().get(c).size() > 0 &&
+				getMap().get(c).iterator().next().getArmy().equals(army)
+			) {
+				return true;
+			}
+		}	
+		
+		return false;
 	}
 }
