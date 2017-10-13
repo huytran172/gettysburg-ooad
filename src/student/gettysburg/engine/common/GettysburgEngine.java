@@ -184,7 +184,7 @@ public class GettysburgEngine implements GbgGame
 		
 		battles.remove(battle);
 		
-		return new BattleResolutionImpl(battle, board);
+		return new BattleResolutionImpl(battle, this);
 	}
 
 	/*
@@ -235,6 +235,10 @@ public class GettysburgEngine implements GbgGame
 	public int getTurnNumber()
 	{
 		return turnNumber;
+	}
+
+	public List<BattleResult> getResults() {
+		return results;
 	}
 
 	/*
@@ -468,5 +472,15 @@ public class GettysburgEngine implements GbgGame
 	{
 		return (this.currentStep == GbgGameStep.CBATTLE && unit.getArmy() == ArmyID.CONFEDERATE) ||
 			(this.currentStep == GbgGameStep.UBATTLE && unit.getArmy() == ArmyID.UNION);
+	}
+	
+	/**
+	 * Generate random number from 0 to 5
+	 * 
+	 * @return int
+	 */
+	public int getRandomNumber()
+	{
+		return (new Random()).nextInt(5);
 	}
 }

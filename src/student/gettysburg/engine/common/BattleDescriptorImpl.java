@@ -62,12 +62,4 @@ public class BattleDescriptorImpl implements BattleDescriptor
 	{
 		return defenders;
 	}
-	
-	public ArmyID getArmyTypeAttackers() {
-		return this.attackers != null ? this.attackers.iterator().next().getArmy() : null;
-	}
-
-	public ArmyID getArmyTypeDefenders() {
-		return this.defenders != null ? this.defenders.iterator().next().getArmy() : null;
-	}
 }

@@ -2,7 +2,6 @@ package student.gettysburg.engine.common;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 import gettysburg.common.BattleDescriptor;
 import gettysburg.common.BattleResolution;
@@ -14,9 +13,9 @@ public class BattleResolutionImpl implements BattleResolution
 	private BattleDescriptor battle;
 	private BattleResolver resolver;
 
-	public BattleResolutionImpl(BattleDescriptor battle, GettysburgBoard board) {
+	public BattleResolutionImpl(BattleDescriptor battle, GettysburgEngine game) {
 		this.battle = battle;
-		resolver = new BattleResolver(board, this);
+		resolver = new BattleResolver(game, this);
 	}
 
 	@Override
@@ -41,22 +40,6 @@ public class BattleResolutionImpl implements BattleResolution
 
 	@Override
 	public Collection<GbgUnit> getEliminatedUnionUnits() {
-		return resolver.getEliminatedUnionUnit();
-	}
-
-	public List<GbgUnit> getActiveConfederateUnit() {
-		return resolver.getActiveConfederateUnit();
-	}
-
-	public List<GbgUnit> getActiveUnionUnit() {
-		return resolver.getActiveUnionUnit();
-	}
-
-	public List<GbgUnit> getEliminatedConfederateUnit() {
-		return resolver.getEliminatedConfederateUnit();
-	}
-
-	public List<GbgUnit> getEliminatedUnionUnit() {
 		return resolver.getEliminatedUnionUnit();
 	}
 

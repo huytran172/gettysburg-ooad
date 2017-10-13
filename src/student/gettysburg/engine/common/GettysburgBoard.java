@@ -254,8 +254,10 @@ public class GettysburgBoard
 		Set<Coordinate> coordinates = new HashSet<Coordinate>();
 		
 		for (GbgUnit unit: units) {
-			for (Coordinate c: ((GbgUnitImpl) unit).getCurrentZoneControl(whereIsUnit(unit))) {
-				coordinates.add(c);
+			if (unit != null) {
+				for (Coordinate c: ((GbgUnitImpl) unit).getCurrentZoneControl(whereIsUnit(unit))) {
+					coordinates.add(c);
+				}
 			}
 		}
 
@@ -272,7 +274,6 @@ public class GettysburgBoard
 	{
 		Coordinate current = whereIsUnit(unit);
 		Collection<Coordinate> enemyCoordinates = getZOCOfUnits(enemies);
-		
 		for (Coordinate moveableCoordinate: ((CoordinateImpl) current).getNeighbors()) {
 			if (moveableCoordinate != null && 
 				! enemyCoordinates.contains(moveableCoordinate)

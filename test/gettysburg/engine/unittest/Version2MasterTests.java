@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import org.junit.*;
 import gettysburg.common.*;
 import gettysburg.common.exceptions.GbgInvalidActionException;
+import gettysburg.engine.common.TestGettysburgEngine;
 import student.gettysburg.engine.common.GbgUnitImpl;
 import student.gettysburg.engine.common.GettysburgBoard;
 import student.gettysburg.engine.common.GettysburgEngine;
@@ -347,12 +348,29 @@ public class Version2MasterTests
 		assertEquals(makeCoordinate(5, 6), testGame.whereIsUnit(heth));
 		game.endStep();		// CBATTLE
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
+		((TestGettysburgEngine) testGame).setRandomNum(0);
 		BattleResolution bs = game.resolveBattle(battle);
 		assertEquals(BattleResult.DELIM, bs.getBattleResult());
 		assertEquals(devin, bs.getEliminatedUnionUnits().iterator().next());
 		assertEquals(heth, bs.getActiveConfederateUnits().iterator().next());
 		assertEquals(0, bs.getActiveUnionUnits().size());
 		assertEquals(0, bs.getEliminatedConfederateUnits().size());
+
+//		((TestGettysburgEngine) testGame).setRandomNum(1);
+//		assertEquals(BattleResult.EXCHANGE, bs.getBattleResult());
+//
+//		((TestGettysburgEngine) testGame).setRandomNum(2);
+//		assertEquals(BattleResult.DELIM, bs.getBattleResult());
+//
+//		((TestGettysburgEngine) testGame).setRandomNum(3);
+//		assertEquals(BattleResult.DELIM, bs.getBattleResult());
+//
+//		((TestGettysburgEngine) testGame).setRandomNum(4);
+//		assertEquals(BattleResult.DELIM, bs.getBattleResult());
+//
+//		((TestGettysburgEngine) testGame).setRandomNum(5);
+//		assertEquals(BattleResult.DELIM, bs.getBattleResult());
+
 	}
 	
 	@Test
@@ -370,7 +388,7 @@ public class Version2MasterTests
 		game.endStep();
 		
 		BattleDescriptor battle = game.getBattlesToResolve().iterator().next();	// Only 1
-		
+		((TestGettysburgEngine) testGame).setRandomNum(0);
 		assertEquals(BattleResult.DELIM, game.resolveBattle(battle).getBattleResult());
 	}
 	

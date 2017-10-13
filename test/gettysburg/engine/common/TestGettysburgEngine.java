@@ -27,9 +27,11 @@ import student.gettysburg.engine.common.GettysburgEngine;
  */
 public class TestGettysburgEngine extends GettysburgEngine implements TestGbgGame
 {
+	private int randomNum;
 
 	public TestGettysburgEngine(GettysburgBoard board) {
 		super(board);
+		this.randomNum = -1;
 	}
 
 	/*
@@ -82,8 +84,22 @@ public class TestGettysburgEngine extends GettysburgEngine implements TestGbgGam
 		this.turnNumber = arg0;
 	}
 	
+	@Override
 	public void setBattleResults(List<BattleResult> results)
 	{
 		this.results = results;
+	}
+	
+	public void setRandomNum(int num) 
+	{
+		this.randomNum = num;
+	}
+	
+	@Override
+	public int getRandomNumber()
+	{
+		final int result = randomNum == -1 ? super.getRandomNumber() : randomNum;
+		randomNum = -1;
+		return result;
 	}
 }
